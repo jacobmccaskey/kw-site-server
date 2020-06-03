@@ -1,7 +1,7 @@
+require("dotenv").config();
 var express = require("express");
 
-require("dotenv").config();
-
+var validator = require("validator");
 var bodyParser = require("body-parser");
 var cors = require("cors");
 var helmet = require("helmet");
@@ -16,7 +16,7 @@ app.use(cors());
 var transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
-    user: process.env.USERNAME,
+    user: process.env.EMAIL,
     pass: process.env.PASSWORD,
   },
 });
@@ -34,16 +34,52 @@ app.post("/post", (req, res) => {
     subject: ` from ${req.body.name}`,
     text: `${req.body.message} ${req.body.email}`,
   };
-
-  transporter.sendMail(mailOptions, (error, info) => {
-    if (error) {
-      console.log(error);
-      res.status(400).send({ error });
-    } else {
-      console.log("Email sent: " + info.response);
-      res.json({ message: "OK" });
-    }
-  });
+  //validation
+  if (
+    validator.isAscii(req.body.name) === true &&
+    validator.isEmail(req.body.email) === true &&
+    validator.isAscii(req.body.message) === true
+  ) {
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.log(error);
+        res.status(400).send({ error });
+      } else {
+        console.log("Email sent: " + info.response);
+        res.json({ message: "OK" });
+      }
+    });
+  } else {
+    res.status(400).send("looks some bad data got thru");
+  }
 });
 
-app.listen(4000);
+app.post("/coaching/post", (req, res) => {
+  var mailOptions = {
+    from: "tampacentralcalendar@gmail.com",
+    to: "icastillo@kw.com",
+    subject: ` from ${req.body.name}`,
+    text: `${req.body.message} 
+    reply-to: ${req.body.email}`,
+  };
+
+  if (
+    validator.isAlpha(req.body.name) === true &&
+    validator.isEmail(req.body.email) === true &&
+    validator.isAscii(req.body.message) === true
+  ) {
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.log(error);
+        res.status(400).send({ error });
+      } else {
+        console.log("Email sent: " + info.response);
+        res.json({ message: "OK" });
+      }
+    });
+  } else {
+    res.status(400).send("looks some bad data got thru");
+  }
+});
+
+app.listen(5000);
