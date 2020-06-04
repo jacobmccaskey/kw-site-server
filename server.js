@@ -1,6 +1,8 @@
 require("dotenv").config();
 var express = require("express");
 
+let port = process.env.PORT || 5000;
+
 var validator = require("validator");
 var bodyParser = require("body-parser");
 var cors = require("cors");
@@ -81,5 +83,5 @@ app.post("/coaching/post", (req, res) => {
     res.status(400).send("looks some bad data got thru");
   }
 });
-
-app.listen(5000);
+console.log(`server live on port:  ${port}`);
+app.listen(port);
