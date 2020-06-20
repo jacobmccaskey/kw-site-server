@@ -28,6 +28,21 @@ app.get("/", (req, res) => {
   res.end("hello");
 });
 
+//simple password Auth for tutorials access
+app.post("/authenticate", (req, res) => {
+  const access = {
+    password: process.env.AUTH,
+  };
+
+  if (req.body.password === access.password) {
+    res.status(200).send({ access: "granted" });
+    res.end();
+  } else {
+    res.status(401).send({ access: "denied" });
+    res.end();
+  }
+});
+
 // sends email from contact form in kw-site
 app.post("/post", (req, res) => {
   var mailOptions = {
